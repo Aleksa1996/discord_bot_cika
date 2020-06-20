@@ -1,0 +1,13 @@
+{
+    "require": {
+        "symfony/http-client": "^5.1"
+    },
+    "require-dev": {
+        "eaglewu/swoole-ide-helper": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Discord\\": "src/"
+        }
+    }
+}

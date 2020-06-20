@@ -1,0 +1,11 @@
+# Created by .ignore support plugin (hsz.mobi)
+/.docker
+/.idea
+/.env
+/.env.local
+/.env.local.php
+/.env.*.local
+/public/bundles/
+/var/
+/vendor/
+/index.php
