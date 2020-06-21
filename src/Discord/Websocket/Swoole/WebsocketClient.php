@@ -2,7 +2,9 @@
 
 namespace Discord\Discord\Websocket\Swoole;
 
+use Discord\Discord\Api\Http\Request;
 use Discord\Discord\Exception\WebsocketClientException;
+use Discord\Discord\Helper\Url;
 use Discord\Discord\Websocket\AbstractPayload;
 use Discord\Discord\Websocket\AbstractWebsocketClient;
 use Swoole\Coroutine;
@@ -36,17 +38,20 @@ class WebsocketClient extends AbstractWebsocketClient
      */
     private function setupSwooleHttpClient()
     {
+        $host = Url::getHost($this->endpoint);
+        $port = Url::getPort($this->endpoint);
+        $ssl = Url::isSSL($this->endpoint);
 
         $this->swooleHttpClient = new SwooleHttpClient(
-            $this->endpoint->getHost(),
-            $this->endpoint->getPort(),
-            $this->endpoint->isSSL()
+            $host,
+            $port,
+            $ssl
         );
 
         $this
             ->swooleHttpClient
             ->setHeaders([
-                'Host' => $this->endpoint->getHost() . ':' . $this->endpoint->getPort(),
+                'Host' => $host . ':' . $port,
                 'User-Agent' => 'websocket-client-php'
             ]);
     }
@@ -58,7 +63,7 @@ class WebsocketClient extends AbstractWebsocketClient
     {
         return $this
             ->swooleHttpClient
-            ->upgrade($this->endpoint->getPathWithQuery());
+            ->upgrade(Url::getPathWithQuery($this->endpoint));
     }
 
     /**

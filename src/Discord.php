@@ -3,12 +3,18 @@
 namespace Discord;
 
 use Discord\Discord\Api\ApiClient;
+use Discord\Discord\Websocket\Swoole\Payload;
 use Discord\Discord\Websocket\Swoole\WebsocketClient;
 use InvalidArgumentException;
 
 class Discord
 {
 
+    /**
+     * Api token
+     *
+     * @var string
+     */
     private $token;
 
     /**
@@ -23,7 +29,7 @@ class Discord
      *
      * @var string
      */
-    private $apiEndpoint = 'https://discordapp.com';
+    private $apiEndpoint = 'https://discordapp.com/api/v6';
 
     /**
      * Websocket client
@@ -43,6 +49,11 @@ class Discord
      * @var WebsocketClient
      */
     private $apiClient;
+
+    /**
+     * @var
+     */
+    private $currentUser;
 
     /**
      * Discord constructor.
@@ -99,7 +110,7 @@ class Discord
      */
     public function on(string $event, callable $callback)
     {
-        $this->events[$event] = $callback;
+        $this->events[$event][] = $callback;
 
         return $this;
     }
@@ -123,8 +134,12 @@ class Discord
      */
     private function registerWebsocketClientEvents()
     {
-        foreach ($this->events as $eventName => $eventCallback) {
-            $this->websocketClient->on($eventName, $eventCallback);
+        $this->events['READY'][] = [$this, 'onReady'];
+
+        foreach ($this->events as $eventName => $eventCallbacks) {
+            foreach ($eventCallbacks as $eventCallback) {
+                $this->websocketClient->on($eventName, $eventCallback);
+            }
         }
     }
 
@@ -136,6 +151,24 @@ class Discord
     public function api()
     {
         return $this->apiClient;
+    }
+
+    /**
+     * Inner event listener
+     *
+     * @param Payload $payload
+     */
+    public function onReady(Payload $payload)
+    {
+        $this->currentUser = $payload->getEventData('user');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrentUser()
+    {
+        return $this->currentUser;
     }
 
 }

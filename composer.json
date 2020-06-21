@@ -1,6 +1,7 @@
 {
     "require": {
-        "symfony/http-client": "^5.1"
+        "symfony/http-client": "^5.1",
+        "ext-json": "*"
     },
     "require-dev": {
         "eaglewu/swoole-ide-helper": "dev-master"

@@ -7,7 +7,7 @@ namespace Discord\Discord\Websocket;
 use Discord\Discord\Helper\ArrayAccessorTrait;
 
 
-abstract class AbstractPayload
+abstract class AbstractPayload implements \JsonSerializable
 {
     use ArrayAccessorTrait;
 
@@ -165,12 +165,22 @@ abstract class AbstractPayload
      */
     public function __toString()
     {
-        return json_encode([
+        return json_encode($this);
+    }
+
+    /**
+     * Implement jsonSerialize method
+     *
+     * @return array|mixed
+     */
+    public function jsonSerialize()
+    {
+        return [
             'op' => $this->opCode,
             'd' => $this->eventData,
             's' => $this->sequenceNumber,
             't' => $this->eventName
-        ]);
+        ];
     }
 
 }

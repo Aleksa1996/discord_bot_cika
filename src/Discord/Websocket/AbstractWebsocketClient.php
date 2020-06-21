@@ -5,7 +5,6 @@ namespace Discord\Discord\Websocket;
 
 
 use Discord\Discord\Exception\WebsocketClientException;
-use Discord\Discord\Helper\Url;
 
 abstract class AbstractWebsocketClient
 {
@@ -85,7 +84,7 @@ abstract class AbstractWebsocketClient
      */
     public function __construct(string $endpoint, string $token)
     {
-        $this->endpoint = new Url($endpoint);
+        $this->endpoint = $endpoint;
         $this->token = $token;
     }
 
@@ -142,7 +141,9 @@ abstract class AbstractWebsocketClient
     protected function dispatchEvent($event, AbstractPayload $payload)
     {
         if (isset($this->listeners[$event])) {
-            $this->listeners[$event]($payload);
+            foreach ($this->listeners[$event] as $listener) {
+                $listener($payload);
+            }
         }
     }
 
@@ -150,11 +151,11 @@ abstract class AbstractWebsocketClient
      * Subscribe to bot event
      *
      * @param string $event
-     * @param callable $callback
+     * @param mixed $callback
      *
      * @throws WebsocketClientException
      */
-    public function on(string $event, callable $callback)
+    public function on(string $event, $callback)
     {
         if (!in_array($event, static::$events, true)) {
             throw new WebsocketClientException(
@@ -162,6 +163,6 @@ abstract class AbstractWebsocketClient
             );
         }
 
-        $this->listeners[$event] = $callback;
+        $this->listeners[$event][] = $callback;
     }
 }

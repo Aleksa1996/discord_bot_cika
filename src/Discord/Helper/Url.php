@@ -1,99 +1,65 @@
 <?php
 
+
 namespace Discord\Discord\Helper;
+
 
 class Url
 {
     /**
-     * @var string
-     */
-    protected $url;
-
-    /**
-     * @var string
-     */
-    protected $scheme;
-
-    /**
-     * @var string
-     */
-    protected $host;
-
-    /**
-     * @var string
-     */
-    protected $path;
-
-    /**
-     * @var string
-     */
-    protected $query;
-
-    /**
-     * Url constructor.
-     *
      * @param $url
-     */
-    public function __construct($url)
-    {
-        $this->url = $url;
-        $this->scheme = $this->getUrlPart('scheme');
-        $this->host = $this->getUrlPart('host');
-        $this->path = $this->getUrlPart('path');
-        $this->query = $this->getUrlPart('query');
-    }
-
-
-    /**
+     *
      * @return string
      */
-    public function getUrl(): string
+    public static function getScheme($url)
     {
-        return $this->url;
+        return self::getUrlPart($url, 'scheme');
     }
 
     /**
+     * @param $url
+     *
      * @return string
      */
-    public function getScheme(): string
+    public static function getHost($url)
     {
-        return $this->scheme;
+        return self::getUrlPart($url, 'host');
     }
 
     /**
+     * @param $url
+     *
      * @return string
      */
-    public function getHost(): string
+    public static function getPath($url)
     {
-        return $this->host;
+        return self::getUrlPart($url, 'path');
     }
 
     /**
+     * @param $url
+     *
      * @return string
      */
-    public function getPath(): string
+    public static function getQuery($url)
     {
-        return $this->path;
+        return self::getUrlPart($url, 'query');
     }
 
     /**
-     * @return string
-     */
-    public function getQuery(): string
-    {
-        return $this->query;
-    }
-
-    /**
+     * @param $url
+     *
      * @return integer
      */
-    public function getPort()
+    public static function getPort($url)
     {
-        if (in_array($this->scheme, ['wss', 'https'])) {
+        $scheme = self::getUrlPart($url, 'scheme');
+
+        if (in_array($scheme, ['wss', 'https'])) {
             return 443;
         }
 
-        if (in_array($this->scheme, ['http', 'ws'])) {
+        if (in_array($scheme, ['http', 'ws'])) {
             return 80;
         }
 
@@ -101,11 +67,15 @@ class Url
     }
 
     /**
+     * @param $url
+     *
      * @return boolean
      */
-    public function isSSL()
+    public static function isSSL($url)
     {
-        if (in_array($this->scheme, ['wss', 'https'])) {
+        $scheme = self::getUrlPart($url, 'scheme');
+
+        if (in_array($scheme, ['wss', 'https'])) {
             return true;
         }
 
@@ -113,23 +83,49 @@ class Url
     }
 
     /**
+     * @param $url
+     *
      * @return string
      */
-    public function getPathWithQuery()
+    public static function getPathWithQuery($url)
     {
-        return $this->getPath() . '?' . $this->getQuery();
+        return self::getUrlPart($url, 'path') . '?' . self::getUrlPart($url, 'query');
     }
 
     /**
      * Parse & get URL part
      *
+     * @param $url
      * @param string $part
      *
      * @return mixed
      */
-    private function getUrlPart(string $part)
+    private static function getUrlPart($url, string $part)
     {
-        $parsedUrl = \parse_url($this->url);
+        $parsedUrl = \parse_url($url);
         return $parsedUrl[$part] ?? null;
+    }
+
+    /**
+     * Replace params in URL
+     *
+     * @param string $url
+     * @param array $params
+     * @param string $paramIdentifier
+     *
+     * @return string
+     */
+    public static function replaceParams($url, array $params, $paramIdentifier = ':')
+    {
+        if (empty($params) || !is_array($params)) {
+            return $url;
+        }
+
+        $paramsWithIdentifiers = [];
+        foreach ($params as $pi => $pv) {
+            $paramsWithIdentifiers[$paramIdentifier . $pi] = $pv;
+        }
+
+        return strtr($url, $paramsWithIdentifiers);
     }
 }
