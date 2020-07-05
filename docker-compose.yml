@@ -21,8 +21,8 @@ services:
     command: 'bash -c "tail -f /dev/null"'
     volumes:
       - './:/var/www/html'
-    depends_on:
-      - mysql
+#    depends_on:
+#      - mysql
 
   # mysql:
   #   container_name: 'mysql'

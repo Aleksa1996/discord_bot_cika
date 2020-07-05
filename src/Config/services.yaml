@@ -1,0 +1,75 @@
+# config/services.yaml
+services:
+
+  #Dispatcher
+  event_dispatcher:
+    class: Symfony\Component\EventDispatcher\EventDispatcher
+
+  #Subscribers
+  message_subscriber:
+    class: Discord\Application\EventSubscriber\MessageSubscriber
+    arguments:
+      - '@channel_send_message_service'
+
+  Discord\Application\EventSubscriber\MessageSubscriber: '@message_subscriber'
+
+  #Services
+  mapper_service:
+    class: Discord\Application\Service\MapperService
+
+  channel_send_message_service:
+    class: Discord\Application\Service\Channel\ChannelSendMessageService
+    arguments:
+      - '@channel_repository'
+      - '@message_repository'
+
+  #Repositories
+  channel_repository:
+    class: Discord\Infrastructure\Persistance\Api\ChannelRepository
+    arguments:
+      - '@discord_config'
+      - '@http_client'
+      - '@mapper_service'
+
+  message_repository:
+    class: Discord\Infrastructure\Persistance\Api\MessageRepository
+    arguments:
+      - '@discord_config'
+      - '@http_client'
+      - '@mapper_service'
+
+  #Config
+  discord_config:
+    class: Discord\Config\Config
+    arguments:
+      - 'https://discordapp.com/api/v6'
+      - 'wss://gateway.discord.gg/?v=6&encoding=json'
+      - 'NzIyODk3NjgwMDAyNTgwNjIy.Xup6SA.UOqxqtqpzbiF07P-7WZKML6mWzk'
+
+  Discord\Config\Config: '@discord_config'
+
+  #Clients
+  websocket_client:
+    class: Discord\Infrastructure\Websocket\Swoole\WebsocketClient
+    arguments:
+      - '@discord_config'
+      - '@event_dispatcher'
+      - '@mapper_service'
+
+  http_client:
+    class: Discord\Infrastructure\Http\Swoole\HttpClient
+
+  runtime_environment:
+    class: Discord\Infrastructure\Environment\SwooleCoroutineRuntimeEnvironment
+
+  discord:
+    class: Discord\Discord
+    arguments:
+      - '@discord_config'
+      - '@http_client'
+      - '@websocket_client'
+      - '@event_dispatcher'
+      - '@runtime_environment'
+
+  Discord\Discord: '@discord'
+
