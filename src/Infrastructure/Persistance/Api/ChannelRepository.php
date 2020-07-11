@@ -4,15 +4,12 @@
 namespace Discord\Infrastructure\Persistance\Api;
 
 
-use Discord\Application\Service\MapperService;
-use Discord\Config\Config;
 use Discord\Domain\Model\Channel\Channel;
 use Discord\Domain\Repository\ChannelRepositoryInterface;
 use Discord\Helper\Url;
 use Discord\Infrastructure\Http\Exception\HttpClientException;
-use Discord\Infrastructure\Http\Swoole\HttpClient;
 
-class ChannelRepository implements ChannelRepositoryInterface
+class ChannelRepository extends ApiRepository implements ChannelRepositoryInterface
 {
     /**
      * @var array
@@ -21,35 +18,6 @@ class ChannelRepository implements ChannelRepositoryInterface
         'get' => '/channels/:channel_id',
         'update' => '/channels/:channel_id',
     ];
-
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var HttpClient
-     */
-    private $httpClient;
-
-    /**
-     * @var MapperService
-     */
-    private $mapperService;
-
-    /**
-     * ChannelRepository constructor.
-     *
-     * @param Config $config
-     * @param HttpClient $httpClient
-     * @param MapperService $mapperService
-     */
-    public function __construct(Config $config, HttpClient $httpClient, MapperService $mapperService)
-    {
-        $this->config = $config;
-        $this->httpClient = $httpClient;
-        $this->mapperService = $mapperService;
-    }
 
     /**
      *

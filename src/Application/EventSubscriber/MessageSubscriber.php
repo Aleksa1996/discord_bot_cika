@@ -39,11 +39,13 @@ class MessageSubscriber implements EventSubscriberInterface
 
     public function onMessageCreate(MessageCreated $event)
     {
-        if ($this->did) {
-            return;
-        }
 
         $message = $event->getMessage();
+
+        if ($message->getAuthor()->getId() != '635186929788387338') {
+            var_dump($message->getAuthor());
+            return;
+        }
 
         $request = new SendMessageRequest(
             $message->getChannelId(),
@@ -51,12 +53,11 @@ class MessageSubscriber implements EventSubscriberInterface
         );
 
         $message = $this->channelSendMessageService->execute($request);
-        $this->did = true;
 
 
-        var_dump($event->getMessage()->getId());
-        var_dump($event->getMessage()->getContent());
-        var_dump($event->getMessage()->getChannelId());
-        var_dump($message);
+//        var_dump($event->getMessage()->getId());
+//        var_dump($event->getMessage()->getContent());
+//        var_dump($event->getMessage()->getChannelId());
+//        var_dump($message);
     }
 }

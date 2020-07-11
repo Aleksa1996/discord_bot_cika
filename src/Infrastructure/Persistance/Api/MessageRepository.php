@@ -4,17 +4,13 @@
 namespace Discord\Infrastructure\Persistance\Api;
 
 
-use Discord\Application\Service\MapperService;
-use Discord\Config\Config;
-use Discord\Domain\Model\Channel\Channel;
 use Discord\Domain\Model\Message\Message;
 use Discord\Domain\Model\Message\MessageApi;
 use Discord\Domain\Repository\MessageRepositoryInterface;
 use Discord\Helper\Url;
 use Discord\Infrastructure\Http\Exception\HttpClientException;
-use Discord\Infrastructure\Http\Swoole\HttpClient;
 
-class MessageRepository implements MessageRepositoryInterface
+class MessageRepository extends ApiRepository implements MessageRepositoryInterface
 {
     /**
      * @var array
@@ -22,35 +18,6 @@ class MessageRepository implements MessageRepositoryInterface
     private static $endpoints = [
         'create' => '/channels/:channel_id/messages'
     ];
-
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var HttpClient
-     */
-    private $httpClient;
-
-    /**
-     * @var MapperService
-     */
-    private $mapperService;
-
-    /**
-     * MessageRepository constructor.
-     *
-     * @param Config $config
-     * @param HttpClient $httpClient
-     * @param MapperService $mapperService
-     */
-    public function __construct(Config $config, HttpClient $httpClient, MapperService $mapperService)
-    {
-        $this->config = $config;
-        $this->httpClient = $httpClient;
-        $this->mapperService = $mapperService;
-    }
 
     /**
      * @inheritDoc

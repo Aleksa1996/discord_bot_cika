@@ -13,16 +13,13 @@ $containerBuilder = new ContainerBuilder();
 $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__ . '/Config'));
 $loader->load('services.yaml');
 
+//$containerBuilder->compile();
+
 $discord = $containerBuilder->get(Discord::class);
+
 
 $discord->subscribe($containerBuilder->get(MessageSubscriber::class));
 
-$discord->start();
 
-//$discord->on('message.created', function (Discord\Infrastructure\Websocket\Event\MessageCreated $message) {
-//    var_dump($message->getMessage()->getId());
-//    var_dump($message->getMessage()->getContent());
-////    var_dump($message->getMessage()->getAuthor());
-//
-//});
-//
+//echo json_encode($containerBuilder->getDefinitions(),JSON_PRETTY_PRINT);
+$discord->start();

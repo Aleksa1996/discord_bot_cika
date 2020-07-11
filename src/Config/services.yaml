@@ -20,7 +20,7 @@ services:
   channel_send_message_service:
     class: Discord\Application\Service\Channel\ChannelSendMessageService
     arguments:
-      - '@channel_repository'
+      - '@Discord\Domain\Repository\ChannelRepositoryInterface'
       - '@message_repository'
 
   #Repositories
@@ -37,6 +37,14 @@ services:
       - '@discord_config'
       - '@http_client'
       - '@mapper_service'
+
+  #Proxy
+  channel_repository_proxy:
+    class: Discord\Infrastructure\Persistance\Proxy\ChannelRepositoryProxy
+    arguments:
+      - '@channel_repository'
+
+  Discord\Domain\Repository\ChannelRepositoryInterface: '@channel_repository_proxy'
 
   #Config
   discord_config:
