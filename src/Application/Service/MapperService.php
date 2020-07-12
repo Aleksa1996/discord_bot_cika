@@ -69,6 +69,7 @@ class MapperService
      * @param $object
      * @param $mutator
      * @param $value
+     *
      * @return mixed
      */
     protected function resolveValue($object, $mutator, $value)

@@ -1,5 +1,6 @@
 <?php
 
+use Discord\Application\EventSubscriber\CommandSubscriber;
 use Discord\Application\EventSubscriber\MessageSubscriber;
 use Discord\Discord;
 use Symfony\Component\Config\FileLocator;
@@ -19,6 +20,7 @@ $discord = $containerBuilder->get(Discord::class);
 
 
 $discord->subscribe($containerBuilder->get(MessageSubscriber::class));
+$discord->subscribe($containerBuilder->get(CommandSubscriber::class));
 
 
 //echo json_encode($containerBuilder->getDefinitions(),JSON_PRETTY_PRINT);

@@ -298,6 +298,7 @@ class Message extends AbstractModel
 
     /**
      * @param User[] $mentions
+     *
      * @return Message
      */
     public function setMentions(array $mentions)

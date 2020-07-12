@@ -22,17 +22,24 @@ class Config
     private $token;
 
     /**
+     * @var string
+     */
+    private $commandSymbol;
+
+    /**
      * Config constructor.
      *
      * @param string $apiEndpoint
      * @param string $websocketEndpoint
      * @param string $token
+     * @param string $commandSymbol
      */
-    public function __construct(string $apiEndpoint, string $websocketEndpoint, string $token)
+    public function __construct(string $apiEndpoint, string $websocketEndpoint, string $token, string $commandSymbol)
     {
         $this->apiEndpoint = $apiEndpoint;
         $this->websocketEndpoint = $websocketEndpoint;
         $this->token = $token;
+        $this->commandSymbol = $commandSymbol;
     }
 
     /**
@@ -86,6 +93,24 @@ class Config
     public function setToken(string $token): Config
     {
         $this->token = $token;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCommandSymbol()
+    {
+        return $this->commandSymbol;
+    }
+
+    /**
+     * @param string $commandSymbol
+     * @return Config
+     */
+    public function setCommandSymbol(string $commandSymbol)
+    {
+        $this->commandSymbol = $commandSymbol;
         return $this;
     }
 

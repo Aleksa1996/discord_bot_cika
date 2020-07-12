@@ -7,13 +7,8 @@ namespace Discord\Infrastructure\Persistance\Proxy;
 use Discord\Domain\Repository\ChannelRepositoryInterface;
 use Discord\Infrastructure\Persistance\Api\ChannelRepository;
 
-class ChannelRepositoryProxy implements ChannelRepositoryInterface
+class ChannelRepositoryProxy extends InMemoryRepositoryProxy implements ChannelRepositoryInterface
 {
-    /**
-     * @var array
-     */
-    private $storage = [];
-
     /**
      * @var ChannelRepositoryInterface
      */
@@ -22,33 +17,6 @@ class ChannelRepositoryProxy implements ChannelRepositoryInterface
     public function __construct(ChannelRepository $channelRepository)
     {
         $this->channelRepository = $channelRepository;
-    }
-
-    /**
-     * Put key-value pair to in memory storage
-     *
-     * @param $key
-     * @param $value
-     *
-     * @return ChannelRepositoryProxy
-     */
-    public function putInStorage($key, $value)
-    {
-        $this->storage[$key] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Get from in memory storage
-     *
-     * @param $key
-     *
-     * @return mixed
-     */
-    public function getFromStorage($key)
-    {
-        return $this->storage[$key] ?? null;
     }
 
     /**

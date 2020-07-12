@@ -3,28 +3,34 @@
 
 namespace Discord\Application\EventSubscriber;
 
-
-use Discord\Application\Service\Channel\ChannelSendMessageService;
-use Discord\Application\Service\Channel\SendMessageRequest;
+use Discord\Application\Service\Message\MessageCommandRequest;
+use Discord\Application\Service\Message\MessageCommandService;
+use Discord\Config\Config;
 use Discord\Infrastructure\Websocket\Event\MessageCreated;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MessageSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var ChannelSendMessageService
+     * @var Config
      */
-    private $channelSendMessageService;
+    private $config;
+
+    /**
+     * @var MessageCommandService
+     */
+    private $messageCommandService;
 
     /**
      * MessageSubscriber constructor.
      *
-     * @param ChannelSendMessageService $channelSendMessageService
+     * @param Config $config
+     * @param MessageCommandService $messageCommandService
      */
-    public function __construct(ChannelSendMessageService $channelSendMessageService)
+    public function __construct(Config $config, MessageCommandService $messageCommandService)
     {
-        $this->channelSendMessageService = $channelSendMessageService;
-        $this->did = false;
+        $this->config = $config;
+        $this->messageCommandService = $messageCommandService;
     }
 
     /**
@@ -37,27 +43,18 @@ class MessageSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * On message create
+     *
+     * @param MessageCreated $event
+     */
     public function onMessageCreate(MessageCreated $event)
     {
-
-        $message = $event->getMessage();
-
-        if ($message->getAuthor()->getId() != '635186929788387338') {
-            var_dump($message->getAuthor());
-            return;
-        }
-
-        $request = new SendMessageRequest(
-            $message->getChannelId(),
-            'Sikilie'
+        $request = new MessageCommandRequest(
+            $this->config->getCommandSymbol(),
+            $event->getMessage()
         );
-
-        $message = $this->channelSendMessageService->execute($request);
-
-
-//        var_dump($event->getMessage()->getId());
-//        var_dump($event->getMessage()->getContent());
-//        var_dump($event->getMessage()->getChannelId());
-//        var_dump($message);
+        
+        $this->messageCommandService->execute($request);
     }
 }

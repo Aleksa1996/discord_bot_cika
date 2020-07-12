@@ -9,9 +9,18 @@ services:
   message_subscriber:
     class: Discord\Application\EventSubscriber\MessageSubscriber
     arguments:
-      - '@channel_send_message_service'
+      - '@discord_config'
+      - '@message_command_service'
 
   Discord\Application\EventSubscriber\MessageSubscriber: '@message_subscriber'
+
+  command_subscriber:
+    class: Discord\Application\EventSubscriber\CommandSubscriber
+    arguments:
+      - '@channel_send_message_service'
+      - '@send_roast_service'
+
+  Discord\Application\EventSubscriber\CommandSubscriber: '@command_subscriber'
 
   #Services
   mapper_service:
@@ -22,6 +31,17 @@ services:
     arguments:
       - '@Discord\Domain\Repository\ChannelRepositoryInterface'
       - '@message_repository'
+
+  send_roast_service:
+    class: Discord\Application\Service\Roast\SendRoastService
+    arguments:
+      - '@channel_send_message_service'
+
+  message_command_service:
+    class: Discord\Application\Service\Message\MessageCommandService
+    arguments:
+      - '@discord_config'
+      - '@event_dispatcher'
 
   #Repositories
   channel_repository:
@@ -38,6 +58,13 @@ services:
       - '@http_client'
       - '@mapper_service'
 
+  user_repository:
+    class: Discord\Infrastructure\Persistance\Api\UserRepository
+    arguments:
+      - '@discord_config'
+      - '@http_client'
+      - '@mapper_service'
+
   #Proxy
   channel_repository_proxy:
     class: Discord\Infrastructure\Persistance\Proxy\ChannelRepositoryProxy
@@ -46,15 +73,12 @@ services:
 
   Discord\Domain\Repository\ChannelRepositoryInterface: '@channel_repository_proxy'
 
-  #Config
-  discord_config:
-    class: Discord\Config\Config
+  user_repository_proxy:
+    class: Discord\Infrastructure\Persistance\Proxy\UserRepositoryProxy
     arguments:
-      - 'https://discordapp.com/api/v6'
-      - 'wss://gateway.discord.gg/?v=6&encoding=json'
-      - 'NzIyODk3NjgwMDAyNTgwNjIy.Xup6SA.UOqxqtqpzbiF07P-7WZKML6mWzk'
+      - '@user_repository'
 
-  Discord\Config\Config: '@discord_config'
+  Discord\Domain\Repository\UserRepositoryInterface: '@user_repository_proxy'
 
   #Clients
   websocket_client:
@@ -81,3 +105,14 @@ services:
 
   Discord\Discord: '@discord'
 
+  #Config
+  discord_config:
+    class: Discord\Config\Config
+    arguments:
+      - 'https://discordapp.com/api/v6'
+      - 'wss://gateway.discord.gg/?v=6&encoding=json'
+      - 'NzIyODk3NjgwMDAyNTgwNjIy.Xup6SA.UOqxqtqpzbiF07P-7WZKML6mWzk'
+      - '~'
+
+
+  Discord\Config\Config: '@discord_config'
