@@ -1,16 +1,47 @@
 # config/services.yaml
 services:
+  # Discord main class
+  discord:
+    synthetic: true
 
-  #Dispatcher
+  Discord\Discord: '@discord'
+
+  # Discord config
+  discord_config:
+    synthetic: true
+
+  Discord\Config: '@discord_config'
+
+  # Clients
+  websocket_client:
+    class: Discord\Infrastructure\Websocket\Swoole\WebsocketClient
+    arguments:
+      - '@discord_config'
+      - '@event_dispatcher'
+      - '@mapper_service'
+    public: true
+
+  Discord\Infrastructure\Websocket\Swoole\WebsocketClient: '@websocket_client'
+
+  http_client:
+    class: Discord\Infrastructure\Http\Swoole\HttpClient
+    public: true
+
+  Discord\Infrastructure\Http\Swoole\HttpClient: '@http_client'
+
+  # Dispatcher
   event_dispatcher:
     class: Symfony\Component\EventDispatcher\EventDispatcher
 
-  #Subscribers
+  Symfony\Component\EventDispatcher\EventDispatcher: '@event_dispatcher'
+
+  # Subscribers
   message_subscriber:
     class: Discord\Application\EventSubscriber\MessageSubscriber
     arguments:
       - '@discord_config'
       - '@message_command_service'
+    tags: ['event.listener']
 
   Discord\Application\EventSubscriber\MessageSubscriber: '@message_subscriber'
 
@@ -19,10 +50,11 @@ services:
     arguments:
       - '@channel_send_message_service'
       - '@send_roast_service'
+    tags: ['event.listener']
 
   Discord\Application\EventSubscriber\CommandSubscriber: '@command_subscriber'
 
-  #Services
+  # Services
   mapper_service:
     class: Discord\Application\Service\MapperService
 
@@ -43,7 +75,7 @@ services:
       - '@discord_config'
       - '@event_dispatcher'
 
-  #Repositories
+  # Repositories
   channel_repository:
     class: Discord\Infrastructure\Persistance\Api\ChannelRepository
     arguments:
@@ -65,7 +97,7 @@ services:
       - '@http_client'
       - '@mapper_service'
 
-  #Proxy
+  # Proxy
   channel_repository_proxy:
     class: Discord\Infrastructure\Persistance\Proxy\ChannelRepositoryProxy
     arguments:
@@ -79,40 +111,3 @@ services:
       - '@user_repository'
 
   Discord\Domain\Repository\UserRepositoryInterface: '@user_repository_proxy'
-
-  #Clients
-  websocket_client:
-    class: Discord\Infrastructure\Websocket\Swoole\WebsocketClient
-    arguments:
-      - '@discord_config'
-      - '@event_dispatcher'
-      - '@mapper_service'
-
-  http_client:
-    class: Discord\Infrastructure\Http\Swoole\HttpClient
-
-  runtime_environment:
-    class: Discord\Infrastructure\Environment\SwooleCoroutineRuntimeEnvironment
-
-  discord:
-    class: Discord\Discord
-    arguments:
-      - '@discord_config'
-      - '@http_client'
-      - '@websocket_client'
-      - '@event_dispatcher'
-      - '@runtime_environment'
-
-  Discord\Discord: '@discord'
-
-  #Config
-  discord_config:
-    class: Discord\Config\Config
-    arguments:
-      - 'https://discordapp.com/api/v6'
-      - 'wss://gateway.discord.gg/?v=6&encoding=json'
-      - 'NzIyODk3NjgwMDAyNTgwNjIy.Xup6SA.UOqxqtqpzbiF07P-7WZKML6mWzk'
-      - '~'
-
-
-  Discord\Config\Config: '@discord_config'
